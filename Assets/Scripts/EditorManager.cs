@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 public class EditorManager : MonoBehaviour
 {
-    enum Phase
+    public enum Phase
     {
         Initial,
         CreatingMap,
@@ -36,6 +36,23 @@ public class EditorManager : MonoBehaviour
     private Vector3 _offset;
     private bool _onDrag;
     private float _zoomChange = 5000f;
+
+    //Instance
+    public static EditorManager Instance;
+
+    void Awake()
+    {
+        if (Instance == null || Instance != this)
+        {
+            Destroy(Instance);
+        }
+        Instance = this;
+    }
+
+    public Phase GetPhase()
+    {
+        return _phase;
+    }
 
     #region Camera Movement
     private void LateUpdate()

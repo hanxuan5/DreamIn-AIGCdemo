@@ -18,6 +18,11 @@ public class Character : MonoBehaviour
 
     private void OnMouseDown()
     {   
+        if (EditorManager.Instance.GetPhase() == EditorManager.Phase.Finished)
+        {
+            return;
+        }
+
         if (Input.GetMouseButton(0))
         {
             _offset = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);

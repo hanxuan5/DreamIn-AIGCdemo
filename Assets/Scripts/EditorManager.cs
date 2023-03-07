@@ -22,6 +22,7 @@ public class EditorManager : MonoBehaviour
     private Phase _phase = Phase.Initial;
 
     //UI Objects
+    public GameObject Background;
     public GameObject Diamond;
     public GameObject Line;
     public GameObject NextButton;
@@ -130,6 +131,7 @@ public class EditorManager : MonoBehaviour
         Prompt.GetComponent<CanvasGroup>().FadeIn(1.0f).SetDelay(1.0f);
         InputField.SetActive(true);
         InputField.GetComponent<CanvasGroup>().FadeIn(1.0f).SetDelay(1.0f);
+        Background.GetComponent<CanvasGroup>().FadeIn(1.0f).SetDelay(1.0f);
 
         //Set Phase
         _phase = Phase.CreatingMap;
@@ -216,6 +218,7 @@ public class EditorManager : MonoBehaviour
     {
         if (Description.text.Length < 5)
         {
+            Debug.Log("Input Description First!");
             return;
         }
 

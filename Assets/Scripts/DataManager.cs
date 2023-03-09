@@ -34,8 +34,10 @@ public class DataManager : MonoBehaviour
     public void GenerateMap(string description)
     {
         //TODO: 调取API，根据description生成图片
+        Map.SetActive(true);
         Map.GetComponent<SpriteRenderer>().sprite = MapSprite;
-        Map.GetComponent<SpriteRenderer>().color = Color.white;
+        Map.GetComponent<SpriteRenderer>().FadeIn(1.0f);
+
     }
 
     public string GenerateBackgroundStory(string description)

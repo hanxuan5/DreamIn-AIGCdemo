@@ -36,7 +36,7 @@ public class EditorManager : MonoBehaviour
     private Vector3 _origin;
     private Vector3 _offset;
     private bool _onDrag;
-    private float _zoomChange = 5000f;
+    private float _zoomChange = 500f;
 
     //Instance
     public static EditorManager Instance;
@@ -257,7 +257,6 @@ public class EditorManager : MonoBehaviour
     private void GenerateMap()
     {
         DataManager.Instance.GenerateMap(Description.text);
-        Camera.main.orthographicSize = 200;
     }
 
     private void GenerateBackgroundStory()

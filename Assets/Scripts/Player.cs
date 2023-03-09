@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private float _speed = 10.0f;
+    public float SPEED = 100.0f;
     Animator animator;
     
     // Initialize Animator
@@ -32,6 +32,6 @@ public class Player : MonoBehaviour
         v *= Mathf.Sqrt(1 - (h * h) / 2.0f);
 
         Vector2 dir = new Vector2(h, v);
-        GetComponent<Rigidbody2D>().velocity = dir * _speed;
+        GetComponent<Rigidbody2D>().velocity = dir * SPEED;
     }
 }

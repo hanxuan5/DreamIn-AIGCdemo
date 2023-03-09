@@ -41,6 +41,8 @@ public class EditorManager : MonoBehaviour
     //Instance
     public static EditorManager Instance;
 
+    public GameObject Player;
+
     void Awake()
     {
         if (Instance == null || Instance != this)
@@ -198,6 +200,7 @@ public class EditorManager : MonoBehaviour
 
         //Show Start Game Button
         StartGameButton.SetActive(true);
+        StartGameButton.GetComponent<CanvasGroup>().FadeIn(1.0f);
     }
 
     public void StartGame()
@@ -208,8 +211,19 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        //TODO: Start Game
+        Background.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { Background.SetActive(false); });
+        Diamond.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { Diamond.SetActive(false); });
+        Line.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { Line.SetActive(false); });
+        NextButton.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { NextButton.SetActive(false); });
+        AIButton.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { AIButton.SetActive(false); });
+        InputField.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { InputField.SetActive(false); });
+        Prompt.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { Prompt.SetActive(false); });
+        StartGameButton.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { StartGameButton.SetActive(false); });
+        
+        Player.SetActive(true);
+        Player.GetComponent<SpriteRenderer>().FadeIn(1.0f);
     }
+
 
     #endregion
 

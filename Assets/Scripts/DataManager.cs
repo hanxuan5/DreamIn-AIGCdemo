@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using Platinio.UI;
 
 public class DataManager : MonoBehaviour
 {
@@ -50,6 +51,7 @@ public class DataManager : MonoBehaviour
             CurCharacter = Instantiate(CharacterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             CurCharacter.transform.parent = GameScene.transform;
             CharacterList.Add(CurCharacter);
+            CurCharacter.GetComponent<SpriteRenderer>().FadeIn(1.0f);
         } else
         {
             //TODO: Change the sprite of CurCharacter

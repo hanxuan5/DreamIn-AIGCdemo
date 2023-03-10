@@ -5,8 +5,9 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float SPEED = 100.0f;
+    private bool _canMove = true;
     Animator animator;
-    
+
     // Initialize Animator
     void Start () {
         animator = GetComponent<Animator>();
@@ -15,6 +16,11 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (_canMove == false)
+        {
+            return;
+        }
+
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
@@ -33,5 +39,15 @@ public class Player : MonoBehaviour
 
         Vector2 dir = new Vector2(h, v);
         GetComponent<Rigidbody2D>().velocity = dir * SPEED;
+    }
+
+    public void DisableMovement()
+    {
+        _canMove = false;
+    }
+
+    public void EnableMovement()
+    {
+        _canMove = true;
     }
 }

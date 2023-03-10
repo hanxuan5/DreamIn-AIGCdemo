@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 using Platinio.UI;
+using TMPro;
+using UnityEngine.UI;
 
 public class DataManager : MonoBehaviour
 {
@@ -20,6 +22,9 @@ public class DataManager : MonoBehaviour
     public GameObject GameScene;
     public string BackgroundStory = "";
     public List<GameObject> CharacterList = new List<GameObject>();
+
+    //UI
+    public GameObject ConversationInputField;
 
     void Awake()
     {
@@ -64,5 +69,10 @@ public class DataManager : MonoBehaviour
     {
         CurCharacter.GetComponent<Character>().CharacterStory = "I'm the king!";
         return "I'm the king!";
+    }
+
+    public void GenerateCharacterResponse()
+    {
+        ConversationInputField.GetComponent<TMP_InputField>().SetTextWithoutNotify("");
     }
 }

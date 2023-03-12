@@ -89,8 +89,8 @@ public class DataManager : MonoBehaviour
         string url = "http://ai.dreamin.land/api/gen_character/";
         UnityWebRequest webRequest = new UnityWebRequest(url, "POST");
         Encoding encoding = Encoding.UTF8;
-        byte[] buffer = encoding.GetBytes("{\"prompt\":\" + description + \"}");
-        Debug.Log("{\"prompt\":" + description + "}");
+        string json = "{" + string.Format("\"prompt\": \"{0}\"", description) + "}";
+        byte[] buffer = encoding.GetBytes(json);
         webRequest.uploadHandler = new UploadHandlerRaw(buffer);
         webRequest.downloadHandler = new DownloadHandlerBuffer();
 

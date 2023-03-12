@@ -4,9 +4,22 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    //Instance
+    public static Player Instance;
+
+    //Movement
     public float SPEED = 100.0f;
     private bool _canMove = true;
     Animator animator;
+
+    void Awake()
+    {
+        if (Instance == null || Instance != this)
+        {
+            Destroy(Instance);
+        }
+        Instance = this;
+    }
 
     // Initialize Animator
     void Start () {

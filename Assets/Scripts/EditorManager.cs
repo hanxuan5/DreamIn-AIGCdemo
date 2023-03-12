@@ -176,6 +176,12 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
+        if (DataManager.Instance.Generating == true)
+        {
+            Debug.Log("Wait for Generating");
+            return;
+        }
+
         Prompt.GetComponent<TMP_Text>().SetText("What's happening to this person?");
         InputField.GetComponent<TMP_InputField>().SetTextWithoutNotify("");
 

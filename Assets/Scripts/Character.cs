@@ -2,13 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Platinio.UI;
+using UnityEngine.UIElements;
+using TMPro;
+using UnityEngine.UI;
 
 public class Character : MonoBehaviour
 {
+    public string CharacterStory = "";
+
+    //Drag
     private bool _dragging = false;
     private Vector3 _offset;
-    public string CharacterStory = "";
-    public GameObject UICanvas;
+
+    //UI Objects
+    public GameObject WorldCanvas;
+    public GameObject ScreenCanvas;
+    public TMP_Text Response;
+    public GameObject ConversationInputField;
 
     private void Update()
     {
@@ -39,14 +49,29 @@ public class Character : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        DataManager.Instance.ConversationInputField.SetActive(true);
-        DataManager.Instance.ConversationInputField.GetComponent<CanvasGroup>().FadeIn(1);
-        UICanvas.GetComponent<CanvasGroup>().FadeIn(1);
+        WorldCanvas.GetComponent<CanvasGroup>().FadeIn(0.5f);
+        ScreenCanvas.GetComponent<CanvasGroup>().FadeIn(0.5f);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        DataManager.Instance.ConversationInputField.GetComponent<CanvasGroup>().FadeOut(1).SetOnComplete(delegate { DataManager.Instance.ConversationInputField.SetActive(true); });
-        UICanvas.GetComponent<CanvasGroup>().FadeOut(1);
+        WorldCanvas.GetComponent<CanvasGroup>().FadeOut(0.5f);
+        ScreenCanvas.GetComponent<CanvasGroup>().FadeOut(0.5f);
+    }
+
+    public void StopMovement()
+    {
+        Player.Instance.DisableMovement();
+    }
+
+    public void StartMovement()
+    {
+        Player.Instance.EnableMovement();
+    }
+
+    public void GenerateCharacterResponse()
+    {
+        ConversationInputField.GetComponent<TMP_InputField>().SetTextWithoutNotify("");
+        DataManager.Instance.GenerateCharacterResponse(Response);
     }
 }

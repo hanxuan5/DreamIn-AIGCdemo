@@ -6,11 +6,19 @@ using UnityEngine.PlayerLoop;
 using Platinio.UI;
 using TMPro;
 using UnityEngine.UI;
+using System.Text.RegularExpressions;
+using System.Text;
+using UnityEngine.Networking;
+using UnityEngine.Playables;
+using LitJson;
+using System.IO;
+using System.Reflection;
 
 public class DataManager : MonoBehaviour
 {
     //Instance
     public static DataManager Instance;
+    public bool Generating = false;
 
     //Temp
     public Sprite MapSprite;
@@ -22,9 +30,6 @@ public class DataManager : MonoBehaviour
     public GameObject GameScene;
     public string BackgroundStory = "";
     public List<GameObject> CharacterList = new List<GameObject>();
-
-    //UI
-    public GameObject ConversationInputField;
 
     void Awake()
     {
@@ -47,18 +52,20 @@ public class DataManager : MonoBehaviour
 
     public string GenerateBackgroundStory(string description)
     {
-        BackgroundStory = "There is a princess \n There is a guard \n There is a prince \n And I'm a sunny happy boy";
-        return "There is a princess \n There is a guard \n There is a prince \n And I'm a sunny happy boy";
+        BackgroundStory = "TODO: Replace with AIGC";
+        return "TODO: Replace with AIGC";
     }
 
     public void GenerateCharacter(string description)
-    {   
+    {
+        Generating = true;
         if (CurCharacter == null)
-        {
+        {   
             CurCharacter = Instantiate(CharacterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             CurCharacter.transform.parent = GameScene.transform;
             CharacterList.Add(CurCharacter);
-            CurCharacter.GetComponent<SpriteRenderer>().FadeIn(1.0f);
+
+            StartCoroutine(GenerateCharacterImage(description));
         } else
         {
             //TODO: Change the sprite of CurCharacter
@@ -67,12 +74,65 @@ public class DataManager : MonoBehaviour
 
     public string GenerateCharacterStory(string description)
     {
-        CurCharacter.GetComponent<Character>().CharacterStory = "I'm the king!";
-        return "I'm the king!";
+        CurCharacter.GetComponent<Character>().CharacterStory = "TODO: Replace with AIGC";
+        return "TODO: Replace with AIGC";
     }
 
-    public void GenerateCharacterResponse()
+    public void GenerateCharacterResponse(TMP_Text response)
     {
-        ConversationInputField.GetComponent<TMP_InputField>().SetTextWithoutNotify("");
+        response.text = "TODO: Replace with AIGC";
     }
+
+    #region IEnumerators
+    IEnumerator GenerateCharacterImage(string description)
+    {
+        string url = "http://ai.dreamin.land/api/gen_character/";
+        UnityWebRequest webRequest = new UnityWebRequest(url, "POST");
+        Encoding encoding = Encoding.UTF8;
+        byte[] buffer = encoding.GetBytes("{\"prompt\":\" + description + \"}");
+        Debug.Log("{\"prompt\":" + description + "}");
+        webRequest.uploadHandler = new UploadHandlerRaw(buffer);
+        webRequest.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.result == UnityWebRequest.Result.ProtocolError || webRequest.result == UnityWebRequest.Result.ConnectionError)
+        {
+            Debug.LogError(webRequest.error + "\n" + webRequest.downloadHandler.text);
+        }
+        else
+        {
+            Debug.Log("Generate Character Image Succcess!");
+        }
+
+        //read and store in gameData
+        ImageData d = JsonMapper.ToObject<ImageData>(webRequest.downloadHandler.text);
+        StartCoroutine(GetCharacterImage(d.image_url));
+    }
+
+    IEnumerator GetCharacterImage(string url)
+    {
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error + "imageLink: " + url);
+        }
+        else
+        {
+            Debug.Log("Get Character Image Succcess!");
+            Texture2D t = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            t.filterMode = FilterMode.Point;
+
+            //Instantiate Character Gameobject
+            CurCharacter.GetComponent<SpriteRenderer>().sprite = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0, 0));
+            CurCharacter.GetComponent<SpriteRenderer>().FadeIn(1.0f);
+        }
+
+        Generating = false;
+    }
+
+
+    #endregion
 }

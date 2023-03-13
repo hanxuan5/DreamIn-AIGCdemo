@@ -71,6 +71,11 @@ public class Character : MonoBehaviour
 
     public void GenerateCharacterResponse()
     {
+        if (ConversationInputField.GetComponent<TMP_InputField>().text.Length == 0)
+        {
+            return;
+        }
+
         ConversationInputField.GetComponent<TMP_InputField>().SetTextWithoutNotify("");
         DataManager.Instance.GenerateCharacterResponse(Response);
     }

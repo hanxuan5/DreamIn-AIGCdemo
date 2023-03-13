@@ -9,27 +9,31 @@ using UnityEngine.UI;
 using System.Text.RegularExpressions;
 using System.Text;
 using UnityEngine.Networking;
-using UnityEngine.Playables;
-using LitJson;
 using System.IO;
 using System.Reflection;
+using System.Net;
+using System.Threading;
+using Newtonsoft.Json;
 
 public class DataManager : MonoBehaviour
 {
     //Instance
     public static DataManager Instance;
-    public bool Generating = false;
 
     //Temp
+    public bool Generating = false;
     public Sprite MapSprite;
+    public GameObject GameScene;
     public GameObject CharacterPrefab;
     public GameObject CurCharacter = null;
 
     //Game Data
     public GameObject Map;
-    public GameObject GameScene;
     public string BackgroundStory = "";
     public List<GameObject> CharacterList = new List<GameObject>();
+
+    //ChatGPT
+    public string ChatGPTKey;
 
     void Awake()
     {
@@ -43,53 +47,83 @@ public class DataManager : MonoBehaviour
     //AI Generate Content API
     public void GenerateMap(string description)
     {
-        //TODO: 调取API，根据description生成图片
+        if (Generating)
+        {
+            Debug.Log("Generating...Do not send multiple requests.");
+            return;
+        }
+        //Generating = true;
         Map.SetActive(true);
         Map.GetComponent<SpriteRenderer>().sprite = MapSprite;
         Map.GetComponent<SpriteRenderer>().FadeIn(1.0f);
 
     }
 
-    public string GenerateBackgroundStory(string description)
+    public void GenerateBackgroundStory(TMP_InputField inputField, string description)
     {
+        if (Generating)
+        {
+            Debug.Log("Generating...Do not send multiple requests.");
+            return;
+        }
+        //Generating = true;
         BackgroundStory = "TODO: Replace with AIGC";
-        return "TODO: Replace with AIGC";
+        inputField.SetTextWithoutNotify("TODO: Replace with AIGC");
     }
 
     public void GenerateCharacter(string description)
     {
+        if (Generating)
+        {
+            Debug.Log("Generating...Do not send multiple requests.");
+            return;
+        }
         Generating = true;
+        Prompt prompt = new Prompt();
+        prompt.PromptText = description;
         if (CurCharacter == null)
         {   
             CurCharacter = Instantiate(CharacterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             CurCharacter.transform.parent = GameScene.transform;
             CharacterList.Add(CurCharacter);
-
-            StartCoroutine(GenerateCharacterImage(description));
+            StartCoroutine(GenerateCharacterImage(prompt));
         } else
         {
-            //TODO: Change the sprite of CurCharacter
+            StartCoroutine(GenerateCharacterImage(prompt));
         }
     }
 
-    public string GenerateCharacterStory(string description)
+    public void GenerateCharacterStory(TMP_InputField inputField, string description)
     {
+        if (Generating)
+        {
+            Debug.Log("Generating...Do not send multiple requests.");
+            return;
+        }
+        //Generating = true;
         CurCharacter.GetComponent<Character>().CharacterStory = "TODO: Replace with AIGC";
-        return "TODO: Replace with AIGC";
+        inputField.SetTextWithoutNotify("TODO: Replace with AIGC");
     }
 
-    public void GenerateCharacterResponse(TMP_Text response)
+    public void GenerateCharacterResponse(TMP_Text text)
     {
-        response.text = "TODO: Replace with AIGC";
+        if (Generating)
+        {
+            Debug.Log("Generating...Do not send multiple requests.");
+            return;
+        }
+        //Generating = true;
+        text.text = "TODO: Replace with AIGC";
     }
 
     #region IEnumerators
-    IEnumerator GenerateCharacterImage(string description)
+    IEnumerator GenerateCharacterImage(Prompt prompt)
     {
         string url = "http://ai.dreamin.land/api/gen_character/";
         UnityWebRequest webRequest = new UnityWebRequest(url, "POST");
         Encoding encoding = Encoding.UTF8;
-        string json = "{" + string.Format("\"prompt\": \"{0}\"", description) + "}";
+
+        string json = JsonConvert.SerializeObject(prompt);
         byte[] buffer = encoding.GetBytes(json);
         webRequest.uploadHandler = new UploadHandlerRaw(buffer);
         webRequest.downloadHandler = new DownloadHandlerBuffer();
@@ -106,8 +140,8 @@ public class DataManager : MonoBehaviour
         }
 
         //read and store in gameData
-        ImageData d = JsonMapper.ToObject<ImageData>(webRequest.downloadHandler.text);
-        StartCoroutine(GetCharacterImage(d.image_url));
+        ImageData d = JsonConvert.DeserializeObject<ImageData>(webRequest.downloadHandler.text);
+        StartCoroutine(GetCharacterImage(d.ImageURL));
     }
 
     IEnumerator GetCharacterImage(string url)
@@ -131,6 +165,34 @@ public class DataManager : MonoBehaviour
         }
 
         Generating = false;
+    }
+
+    IEnumerator GenerateText(TMP_Text response, Chat chat)
+    {
+        string requestBody = JsonConvert.SerializeObject(chat);
+        byte[] requestBodyBytes = System.Text.Encoding.UTF8.GetBytes(requestBody);
+
+        UnityWebRequest request = new UnityWebRequest("https://api.openai.com/v1/chat/completions", "POST");
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("Authorization", "Bearer " + ChatGPTKey);
+        request.uploadHandler = new UploadHandlerRaw(requestBodyBytes);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.timeout = 10;
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.ConnectionError ||
+            request.result == UnityWebRequest.Result.DataProcessingError ||
+            request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.LogError(request.error);
+        }
+        else
+        {
+            string responseText = request.downloadHandler.text;
+            // Process the responseText as needed
+            Debug.Log(responseText);
+        }
     }
 
 

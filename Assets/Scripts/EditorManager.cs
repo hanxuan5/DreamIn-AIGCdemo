@@ -267,7 +267,7 @@ public class EditorManager : MonoBehaviour
 
     private void GenerateBackgroundStory()
     {
-        InputField.GetComponent<TMP_InputField>().SetTextWithoutNotify(DataManager.Instance.GenerateBackgroundStory(Description.text));
+        DataManager.Instance.GenerateBackgroundStory(InputField.GetComponent<TMP_InputField>(), Description.text);
     }
 
     private void GenerateCharacter()
@@ -277,7 +277,7 @@ public class EditorManager : MonoBehaviour
 
     private void GenerateCharacterStory()
     {
-        InputField.GetComponent<TMP_InputField>().SetTextWithoutNotify(DataManager.Instance.GenerateCharacterStory(Description.text));
+        DataManager.Instance.GenerateCharacterStory(InputField.GetComponent<TMP_InputField>(), Description.text);
     }
 
     #endregion

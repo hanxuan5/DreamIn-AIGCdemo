@@ -81,3 +81,21 @@ public class ChatResponse
     public Usage Usage { get; set; }
 }
 
+public class GameData
+{
+    [JsonProperty("map_image")]
+    public string MapImage { get; set; }
+
+    [JsonProperty("background_story")]
+    public string BackgroundStory { get; set; }
+}
+
+public class CharacterData
+{
+    [JsonProperty("character_image")]
+    public string CharacterImage { get; set; }
+
+    [JsonProperty("character_story")]
+    public string CharacterStory { get; set; }
+}
+

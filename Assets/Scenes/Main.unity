@@ -1279,6 +1279,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb98a425602f1f49ad86bd534f16a5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Map: {fileID: 983963044}
+  BackgroundStory: 
+  GameScene: {fileID: 1548099946}
+  CharacterPrefab: {fileID: 2144975754877942091, guid: 77db60db4ef24184c8aa60e196482402, type: 3}
+  CurCharacter: {fileID: 0}
+  CharacterList: []
   Background: {fileID: 574115254}
   Diamond: {fileID: 1243783543}
   Line: {fileID: 1131880957}
@@ -3039,13 +3045,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapSprite: {fileID: 21300000, guid: b630e059549064a4ba3565e1d7781cae, type: 3}
-  CharacterPrefab: {fileID: 2144975754877942091, guid: 77db60db4ef24184c8aa60e196482402, type: 3}
-  CurCharacter: {fileID: 0}
-  Map: {fileID: 983963044}
-  GameScene: {fileID: 1548099946}
-  BackgroundStory: 
-  CharacterList: []
-  ConversationInputField: {fileID: 1375754526}
+  Generating: 0
+  ChatGPTKey: 
 --- !u!1 &1995593193
 GameObject:
   m_ObjectHideFlags: 0

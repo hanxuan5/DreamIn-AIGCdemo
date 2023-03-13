@@ -20,17 +20,11 @@ public class DataManager : MonoBehaviour
     //Instance
     public static DataManager Instance;
 
-    //Temp
-    public bool Generating = false;
+    //Fake Data
     public Sprite MapSprite;
-    public GameObject GameScene;
-    public GameObject CharacterPrefab;
-    public GameObject CurCharacter = null;
 
-    //Game Data
-    public GameObject Map;
-    public string BackgroundStory = "";
-    public List<GameObject> CharacterList = new List<GameObject>();
+    //Block Multiple Requests
+    public bool Generating = false;
 
     //ChatGPT
     public string ChatGPTKey;
@@ -45,7 +39,7 @@ public class DataManager : MonoBehaviour
     }
 
     //AI Generate Content API
-    public void GenerateMap(string description)
+    public void GenerateMap(GameObject map, string description)
     {
         if (Generating)
         {
@@ -53,9 +47,9 @@ public class DataManager : MonoBehaviour
             return;
         }
         //Generating = true;
-        Map.SetActive(true);
-        Map.GetComponent<SpriteRenderer>().sprite = MapSprite;
-        Map.GetComponent<SpriteRenderer>().FadeIn(1.0f);
+        map.SetActive(true);
+        map.GetComponent<SpriteRenderer>().sprite = MapSprite;
+        map.GetComponent<SpriteRenderer>().FadeIn(1.0f);
 
     }
 
@@ -67,11 +61,10 @@ public class DataManager : MonoBehaviour
             return;
         }
         //Generating = true;
-        BackgroundStory = "TODO: Replace with AIGC";
         inputField.SetTextWithoutNotify("TODO: Replace with AIGC");
     }
 
-    public void GenerateCharacter(string description)
+    public void GenerateCharacter(GameObject curCharacter, string description)
     {
         if (Generating)
         {
@@ -81,16 +74,7 @@ public class DataManager : MonoBehaviour
         Generating = true;
         Prompt prompt = new Prompt();
         prompt.PromptText = description;
-        if (CurCharacter == null)
-        {   
-            CurCharacter = Instantiate(CharacterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            CurCharacter.transform.parent = GameScene.transform;
-            CharacterList.Add(CurCharacter);
-            StartCoroutine(GenerateCharacterImage(prompt));
-        } else
-        {
-            StartCoroutine(GenerateCharacterImage(prompt));
-        }
+        StartCoroutine(GenerateCharacterImage(curCharacter, prompt));
     }
 
     public void GenerateCharacterStory(TMP_InputField inputField, string description)
@@ -101,7 +85,6 @@ public class DataManager : MonoBehaviour
             return;
         }
         //Generating = true;
-        CurCharacter.GetComponent<Character>().CharacterStory = "TODO: Replace with AIGC";
         inputField.SetTextWithoutNotify("TODO: Replace with AIGC");
     }
 
@@ -117,7 +100,7 @@ public class DataManager : MonoBehaviour
     }
 
     #region IEnumerators
-    IEnumerator GenerateCharacterImage(Prompt prompt)
+    IEnumerator GenerateCharacterImage(GameObject curCharacter, Prompt prompt)
     {
         string url = "http://ai.dreamin.land/api/gen_character/";
         UnityWebRequest webRequest = new UnityWebRequest(url, "POST");
@@ -141,10 +124,10 @@ public class DataManager : MonoBehaviour
 
         //read and store in gameData
         ImageData d = JsonConvert.DeserializeObject<ImageData>(webRequest.downloadHandler.text);
-        StartCoroutine(GetCharacterImage(d.ImageURL));
+        StartCoroutine(GetCharacterImage(curCharacter, d.ImageURL));
     }
 
-    IEnumerator GetCharacterImage(string url)
+    IEnumerator GetCharacterImage(GameObject curCharacter, string url)
     {
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
         yield return www.SendWebRequest();
@@ -160,8 +143,8 @@ public class DataManager : MonoBehaviour
             t.filterMode = FilterMode.Point;
 
             //Instantiate Character Gameobject
-            CurCharacter.GetComponent<SpriteRenderer>().sprite = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0, 0));
-            CurCharacter.GetComponent<SpriteRenderer>().FadeIn(1.0f);
+            curCharacter.GetComponent<SpriteRenderer>().sprite = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0, 0));
+            curCharacter.GetComponent<SpriteRenderer>().FadeIn(1.0f);
         }
 
         Generating = false;

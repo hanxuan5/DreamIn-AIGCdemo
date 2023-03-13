@@ -21,6 +21,15 @@ public class EditorManager : MonoBehaviour
     //Phase
     private Phase _phase = Phase.Initial;
 
+    //Game Objects & Data
+    public GameObject Map;
+    public string BackgroundStory;
+    public GameObject GameScene;
+    public GameObject CharacterPrefab;
+    public GameObject CurCharacter = null;
+    public List<GameObject> CharacterList = new List<GameObject>();
+
+
     //UI Objects
     public GameObject Background;
     public GameObject Diamond;
@@ -141,7 +150,7 @@ public class EditorManager : MonoBehaviour
 
     private void StartCreatingBackgroundStory()
     {  
-        if (DataManager.Instance.Map.GetComponent<SpriteRenderer>().color != Color.white)
+        if (Map.active == false)
         {
             Debug.Log("Create A Map First!");
             return;
@@ -155,12 +164,13 @@ public class EditorManager : MonoBehaviour
 
     private void StartCreatingCharacterV0()
     {
-        if (DataManager.Instance.BackgroundStory == "")
+        if (InputField.GetComponent<TMP_InputField>().text.Length < 10)
         {
             Debug.Log("Create A Background Story First!");
             return;
         }
 
+        BackgroundStory = InputField.GetComponent<TMP_InputField>().text;
         Prompt.GetComponent<TMP_Text>().SetText("Anyone is here?");
         InputField.GetComponent<TMP_InputField>().SetTextWithoutNotify("");
 
@@ -170,7 +180,7 @@ public class EditorManager : MonoBehaviour
 
     private void StartCreatingCharacterStory()
     {
-        if (DataManager.Instance.CurCharacter == null)
+        if (CurCharacter == null)
         {
             Debug.Log("Create A Character First!");
             return;
@@ -191,13 +201,14 @@ public class EditorManager : MonoBehaviour
 
     private void StartCreatingCharacterV1()
     {
-        if (DataManager.Instance.CurCharacter.GetComponent<Character>().CharacterStory == "")
+        if (InputField.GetComponent<TMP_InputField>().text.Length < 10)
         {
             Debug.Log("Create A Character Story First!");
             return;
         }
 
-        DataManager.Instance.CurCharacter = null;
+        CurCharacter.GetComponent<Character>().CharacterStory = InputField.GetComponent<TMP_InputField>().text;
+        CurCharacter = null;
         Prompt.GetComponent<TMP_Text>().SetText("Anyone is here?");
         InputField.GetComponent<TMP_InputField>().SetTextWithoutNotify("");
 
@@ -211,7 +222,7 @@ public class EditorManager : MonoBehaviour
 
     public void StartGame()
     {
-        if (DataManager.Instance.CurCharacter != null)
+        if (CurCharacter != null)
         {
             Debug.Log("Finish Current Character First!");
             return;
@@ -262,7 +273,7 @@ public class EditorManager : MonoBehaviour
 
     private void GenerateMap()
     {
-        DataManager.Instance.GenerateMap(Description.text);
+        DataManager.Instance.GenerateMap(Map, Description.text);
     }
 
     private void GenerateBackgroundStory()
@@ -272,7 +283,16 @@ public class EditorManager : MonoBehaviour
 
     private void GenerateCharacter()
     {
-        DataManager.Instance.GenerateCharacter(Description.text);
+        if (CurCharacter == null)
+        {
+            CurCharacter = Instantiate(CharacterPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            CurCharacter.transform.parent = GameScene.transform;
+            CharacterList.Add(CurCharacter);
+            DataManager.Instance.GenerateCharacter(CurCharacter, Description.text);
+        } else
+        {
+            DataManager.Instance.GenerateCharacter(CurCharacter, Description.text);
+        }
     }
 
     private void GenerateCharacterStory()

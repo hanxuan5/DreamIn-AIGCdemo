@@ -3045,8 +3045,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MapSprite: {fileID: 21300000, guid: b630e059549064a4ba3565e1d7781cae, type: 3}
+  CharacterSprite: {fileID: 21300000, guid: b9e076f7c6a832d49bd69acbb41ee9c3, type: 3}
   Generating: 0
-  ChatGPTKey: 
+  ChatGPTKey: org-d1tRV2MPvc9BSdyMsHYuaFt3
 --- !u!1 &1995593193
 GameObject:
   m_ObjectHideFlags: 0

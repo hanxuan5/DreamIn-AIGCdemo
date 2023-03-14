@@ -22,6 +22,7 @@ public class DataManager : MonoBehaviour
 
     //Fake Data
     public Sprite MapSprite;
+    public Sprite CharacterSprite;
 
     //Block Multiple Requests
     public bool Generating = false;
@@ -41,62 +42,48 @@ public class DataManager : MonoBehaviour
     //AI Generate Content API
     public void GenerateMap(GameObject map, string description)
     {
-        if (Generating)
-        {
-            Debug.Log("Generating...Do not send multiple requests.");
-            return;
-        }
-        //Generating = true;
         map.SetActive(true);
         map.GetComponent<SpriteRenderer>().sprite = MapSprite;
         map.GetComponent<SpriteRenderer>().FadeIn(1.0f);
-
+        Generating = false;
     }
 
-    public void GenerateBackgroundStory(TMP_InputField inputField, string description)
+    public void GenerateBackgroundStory(TMP_InputField inputField)
     {
-        if (Generating)
-        {
-            Debug.Log("Generating...Do not send multiple requests.");
-            return;
-        }
-        //Generating = true;
-        inputField.SetTextWithoutNotify("TODO: Replace with AIGC");
+        Message message = new Message();
+        message.Role = "user";
+        message.Content = inputField.text;
+        Chat chat = new Chat();
+        chat.Model = "text-davinci-003";
+        chat.Messages = new List<Message> { message };
+
+        inputField.text = "TODO: Replace with AIGC";
+        Generating = false;
+        return;
     }
 
     public void GenerateCharacter(GameObject curCharacter, string description)
     {
-        if (Generating)
-        {
-            Debug.Log("Generating...Do not send multiple requests.");
-            return;
-        }
-        Generating = true;
+        /*
         Prompt prompt = new Prompt();
         prompt.PromptText = description;
         StartCoroutine(GenerateCharacterImage(curCharacter, prompt));
+        */
+        curCharacter.GetComponent<SpriteRenderer>().sprite = CharacterSprite;
+        curCharacter.GetComponent<SpriteRenderer>().FadeIn(1.0f);
+        Generating = false;
     }
 
     public void GenerateCharacterStory(TMP_InputField inputField, string description)
     {
-        if (Generating)
-        {
-            Debug.Log("Generating...Do not send multiple requests.");
-            return;
-        }
-        //Generating = true;
         inputField.SetTextWithoutNotify("TODO: Replace with AIGC");
+        Generating = false;
     }
 
     public void GenerateCharacterResponse(TMP_Text text)
     {
-        if (Generating)
-        {
-            Debug.Log("Generating...Do not send multiple requests.");
-            return;
-        }
-        //Generating = true;
         text.text = "TODO: Replace with AIGC";
+        Generating = false;
     }
 
     #region IEnumerators
@@ -150,10 +137,10 @@ public class DataManager : MonoBehaviour
         Generating = false;
     }
 
-    IEnumerator GenerateText(TMP_Text response, Chat chat)
+    IEnumerator GenerateText(TMP_InputField inputField, Chat chat)
     {
         string requestBody = JsonConvert.SerializeObject(chat);
-        byte[] requestBodyBytes = System.Text.Encoding.UTF8.GetBytes(requestBody);
+        byte[] requestBodyBytes = Encoding.UTF8.GetBytes(requestBody);
 
         UnityWebRequest request = new UnityWebRequest("https://api.openai.com/v1/chat/completions", "POST");
         request.SetRequestHeader("Content-Type", "application/json");
@@ -176,8 +163,9 @@ public class DataManager : MonoBehaviour
             // Process the responseText as needed
             Debug.Log(responseText);
         }
-    }
 
+        Generating = false;
+    }
 
     #endregion
 }

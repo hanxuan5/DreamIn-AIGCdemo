@@ -108,6 +108,11 @@ public class EditorManager : MonoBehaviour
     #region NextPhaseButton
     public void NextPhaseButton()
     {
+        if (DataManager.Instance.Generating)
+        {
+            Debug.Log("Generating...");
+            return;
+        }
         switch(_phase)
         {
             case Phase.Initial:
@@ -186,12 +191,6 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        if (DataManager.Instance.Generating == true)
-        {
-            Debug.Log("Wait for Generating");
-            return;
-        }
-
         Prompt.GetComponent<TMP_Text>().SetText("What's happening to this person?");
         InputField.GetComponent<TMP_InputField>().SetTextWithoutNotify("");
 
@@ -236,7 +235,9 @@ public class EditorManager : MonoBehaviour
         InputField.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { InputField.SetActive(false); });
         Prompt.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { Prompt.SetActive(false); });
         StartGameButton.GetComponent<CanvasGroup>().FadeOut(1.0f).SetOnComplete(delegate { StartGameButton.SetActive(false); });
-        
+
+        _phase = Phase.Finished;
+
         Player.SetActive(true);
         Player.GetComponent<SpriteRenderer>().FadeIn(1.0f);
     }
@@ -252,6 +253,14 @@ public class EditorManager : MonoBehaviour
             Debug.Log("Input Description First!");
             return;
         }
+
+        if (DataManager.Instance.Generating)
+        {
+            Debug.Log("Waiting for Generating. Do not Send Multiple Requests");
+            return;
+        }
+
+        DataManager.Instance.Generating = true;
 
         switch (_phase)
         {
@@ -278,7 +287,8 @@ public class EditorManager : MonoBehaviour
 
     private void GenerateBackgroundStory()
     {
-        DataManager.Instance.GenerateBackgroundStory(InputField.GetComponent<TMP_InputField>(), Description.text);
+        DataManager.Instance.GenerateBackgroundStory(InputField.GetComponent<TMP_InputField>());
+        BackgroundStory = InputField.GetComponent<TMP_InputField>().text;
     }
 
     private void GenerateCharacter()
